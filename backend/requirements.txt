@@ -7,3 +7,4 @@ supabase
 pyjwt
 chromadb
 pyyaml
+reportlab
