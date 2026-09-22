@@ -1,5 +1,4 @@
 import { notFound, redirect } from "next/navigation";
-import Link from "next/link";
 import { Download } from "lucide-react";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { TopBar } from "@/components/layout/top-bar";
@@ -7,6 +6,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { DiagnosisPanel } from "@/components/inspection/diagnosis-panel";
 import { EvidencePanel } from "@/components/inspection/evidence-panel";
 import { RepairPlanPanel } from "@/components/inspection/repair-plan-panel";
+import { Checklist } from "@/components/inspection/checklist";
 import { PipelineTracker, type PipelineStep } from "@/components/shared/pipeline-tracker";
 import { formatDate } from "@/lib/utils";
 import type { Inspection } from "@/lib/types";
@@ -30,48 +30,13 @@ async function getInspection(id: string, token: string): Promise<Inspection | nu
 function buildPipelineSteps(insp: Inspection): PipelineStep[] {
   const hasDiagnosis = !!insp.diagnosis?.root_cause;
   return [
-    {
-      id: "vision",
-      label: "Vision Analysis",
-      description: "Detecting visible components and abnormalities",
-      status: insp.vision_result ? "done" : insp.status === "analyzing" ? "running" : "pending",
-    },
-    {
-      id: "investigation",
-      label: "Investigation",
-      description: "Generating possible causes",
-      status: hasDiagnosis ? "done" : insp.status === "analyzing" ? "running" : "pending",
-    },
-    {
-      id: "questions",
-      label: "Guided Questions",
-      description: "Collecting technician observations",
-      status: insp.answers ? "done" : "pending",
-    },
-    {
-      id: "knowledge",
-      label: "Knowledge Retrieval",
-      description: "Searching technical knowledge base",
-      status: hasDiagnosis ? "done" : "pending",
-    },
-    {
-      id: "reasoning",
-      label: "Root Cause Reasoning",
-      description: "Evaluating evidence",
-      status: hasDiagnosis ? "done" : "pending",
-    },
-    {
-      id: "repair",
-      label: "Repair Plan",
-      description: "Generating step-by-step repair instructions",
-      status: insp.repair_plan ? "done" : "pending",
-    },
-    {
-      id: "report",
-      label: "Report",
-      description: "Assembling inspection report",
-      status: insp.pdf_url ? "done" : "pending",
-    },
+    { id: "vision",        status: insp.vision_result ? "done" : insp.status === "analyzing" ? "running" : "pending" },
+    { id: "investigation", status: hasDiagnosis ? "done" : insp.status === "analyzing" ? "running" : "pending" },
+    { id: "questions",     status: insp.answers ? "done" : "pending" },
+    { id: "knowledge",     status: hasDiagnosis ? "done" : "pending" },
+    { id: "reasoning",     status: hasDiagnosis ? "done" : "pending" },
+    { id: "repair",        status: insp.repair_plan ? "done" : "pending" },
+    { id: "report",        status: insp.pdf_url ? "done" : "pending" },
   ];
 }
 
@@ -187,33 +152,11 @@ export default async function InspectionDetailPage({
                     <p className="text-xs font-medium text-text-secondary uppercase tracking-wide mb-3">
                       Checklist
                     </p>
-                    <div className="space-y-1.5">
-                      {insp.checklist_state.map((item, i) => (
-                        <div
-                          key={i}
-                          className={`flex items-start gap-2.5 rounded-md p-2.5 ${
-                            item.checked ? "bg-success-tint" : "bg-background"
-                          }`}
-                        >
-                          <span
-                            className={`text-sm flex-shrink-0 ${
-                              item.checked ? "text-success" : "text-border"
-                            }`}
-                          >
-                            {item.checked ? "✓" : "○"}
-                          </span>
-                          <span
-                            className={`text-sm ${
-                              item.checked
-                                ? "line-through text-text-secondary"
-                                : "text-text-primary"
-                            }`}
-                          >
-                            {item.step}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
+                    <Checklist
+                      items={insp.checklist_state}
+                      onToggle={() => {}}
+                      disabled
+                    />
                   </div>
                 )}
               </>
