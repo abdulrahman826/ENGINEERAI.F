@@ -21,6 +21,12 @@ mobile/android/local.properties
 mobile/android/key.properties
 mobile/*.iml
 
+# Next.js web client
+web/node_modules/
+web/.next/
+web/.env.local
+web/tsconfig.tsbuildinfo
+
 # OS/editor
 .DS_Store
 Thumbs.db
